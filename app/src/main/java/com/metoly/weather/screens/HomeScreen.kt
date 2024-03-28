@@ -24,15 +24,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults.textFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +48,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.metoly.weather.ViewModel.HomeViewModel
 import com.metoly.weather.models.BaseModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
@@ -55,6 +59,9 @@ fun HomeScreen(
     val (city, setCity) = remember {
         mutableStateOf("")
     }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(city) {
         delay(500)
@@ -84,10 +91,10 @@ fun HomeScreen(
                 .background(MaterialTheme.colorScheme.secondary),
             contentAlignment = Alignment.Center
         ) {
-            TextField(modifier=Modifier.fillMaxWidth(),value = city, onValueChange = {
+            TextField(modifier = Modifier.fillMaxWidth(), value = city, onValueChange = {
                 setCity(it)
-            }, colors = textFieldColors(
-                containerColor=Color.Transparent,
+            }, colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 errorIndicatorColor = Color.Transparent,
@@ -113,19 +120,21 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             items(data.data) { location ->
-                                Row(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(70.dp)
-                                    .clip(
-                                        RoundedCornerShape(8.dp)
-                                    )
-                                    .background(MaterialTheme.colorScheme.secondary)
-                                    .clickable {
-                                        navController.navigate("weather/${location.key}/${location.englishName}/${location.country.englishName}")
-                                    }
-                                    .padding(8.dp),
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(70.dp)
+                                        .clip(
+                                            RoundedCornerShape(8.dp)
+                                        )
+                                        .background(MaterialTheme.colorScheme.secondary)
+                                        .clickable {
+                                            navController.navigate("weather/${location.key}/${location.englishName}/${location.country.englishName}")
+                                        }
+                                        .padding(8.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically) {
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
                                     Column {
                                         Text(
                                             location.englishName,
@@ -142,8 +151,8 @@ fun HomeScreen(
                             }
                         }
                     }
-
-                    else -> {}
+                    else -> {
+                    }
                 }
             }
         }
@@ -155,15 +164,23 @@ fun HomeScreen(
             CircularProgressIndicator(color = Color.White)
         }
     }
+    SnackbarHost(
+        hostState = snackbarHostState,
+        modifier = Modifier.padding(16.dp)
+    ) {
+        // Nothing to do here
+    }
     AnimatedVisibility(
         visible = locations is BaseModel.Error,
         enter = fadeIn() + scaleIn(),
         exit = fadeOut() + scaleOut()
     ) {
         val errorModel = locations as BaseModel.Error
-        Text(
-            text = "Error occurred: ${errorModel.error}",
-            color = Color.Red
-        )
+        coroutineScope.launch {
+            snackbarHostState.showSnackbar(
+                message = "Error occurred: ${errorModel.error}",
+                actionLabel = "Dismiss"
+            )
+        }
     }
 }
