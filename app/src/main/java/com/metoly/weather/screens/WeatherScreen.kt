@@ -32,8 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.ImagePainter
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.metoly.weather.ViewModel.WeatherViewModel
 import com.metoly.weather.models.BaseModel
 import java.text.SimpleDateFormat
@@ -198,7 +197,7 @@ fun WeatherIcon(iconNumber: String) {
         }
     } else {
         val iconUrl = "https://developer.accuweather.com/sites/default/files/$iconNumber-s.png"
-        val painter = rememberImagePainter(iconUrl)
+        val painter = rememberAsyncImagePainter(iconUrl)
 
         Box(modifier = Modifier.size(70.dp)) {
             Image(

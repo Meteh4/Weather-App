@@ -60,9 +60,6 @@ fun HomeScreen(
         mutableStateOf("")
     }
 
-    val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
-
     LaunchedEffect(city) {
         delay(500)
         if (city.isNotEmpty()) {
@@ -162,25 +159,6 @@ fun HomeScreen(
             exit = fadeOut() + scaleOut()
         ) {
             CircularProgressIndicator(color = Color.White)
-        }
-    }
-    SnackbarHost(
-        hostState = snackbarHostState,
-        modifier = Modifier.padding(16.dp)
-    ) {
-        // Nothing to do here
-    }
-    AnimatedVisibility(
-        visible = locations is BaseModel.Error,
-        enter = fadeIn() + scaleIn(),
-        exit = fadeOut() + scaleOut()
-    ) {
-        val errorModel = locations as BaseModel.Error
-        coroutineScope.launch {
-            snackbarHostState.showSnackbar(
-                message = "Error occurred: ${errorModel.error}",
-                actionLabel = "Dismiss"
-            )
         }
     }
 }
