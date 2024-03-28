@@ -34,7 +34,7 @@ data class Position(
     val latitude:Double,
     @SerializedName("Longitude")
     val longitude:Double,
-    @SerializedName("com.metoly.weather.models.Elevation")
+    @SerializedName("Elevation")
     val elevation: Elevation
 )
 
@@ -46,7 +46,7 @@ data class Elevation(
 )
 
 data class Value(
-    @SerializedName("com.metoly.weather.models.Value")
+    @SerializedName("Value")
     val value:Double,
     @SerializedName("Unit")
     val unit:String,
