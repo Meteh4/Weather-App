@@ -197,8 +197,17 @@ fun WeatherIcon(iconNumber: String) {
             println(drawableName)
         }
     } else {
-        Text(text = "Icon not found", color = Color.Red)
-        println(drawableName)
+        val iconUrl = "https://developer.accuweather.com/sites/default/files/$iconNumber-s.png"
+        val painter = rememberImagePainter(iconUrl)
+
+        Box(modifier = Modifier.size(70.dp)) {
+            Image(
+                painter = painter,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }
 
